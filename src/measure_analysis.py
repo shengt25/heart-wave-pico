@@ -1,10 +1,10 @@
 import time
-from utils import print_log, get_datetime
-from result import dict2show_items
-from save_system import save_system
-from state import State
-from data_processing import calculate_hrv, get_kubios_analysis
-from resources.pic_loading_circle import LoadingCircle
+from src.utils import get_datetime
+from src.result import dict2show_items
+from src.save_system import save_system
+from src.state import State
+from src.data_processing import calculate_hrv, get_kubios_analysis
+from src.res.pic_loading_circle import LoadingCircle
 import framebuf
 
 

@@ -1,9 +1,9 @@
 from machine import Pin, I2C, ADC
 from ssd1306 import SSD1306_I2C as SSD1306_I2C_
 import time
-from lib.piotimer import Piotimer
-from utils import print_log
-from data_processing import Fifo
+from piotimer import Piotimer
+from src.utils import print_log
+from src.data_processing import Fifo
 
 
 class EncoderEvent:

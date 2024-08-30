@@ -1,11 +1,11 @@
-from hardware import Display, RotaryEncoder, HeartSensor
-from view import View
-from pico_network import PicoNetwork
-from main_menu import MainMenu
-from measure import MeasureWait, Measure
-from measure_analysis import MeasureResultCheck, HRVAnalysis, KubiosAnalysis
-from result import ShowHistory, ShowResult
-from settings import Settings, SettingsDebugInfo, SettingsWifi, SettingsMqtt, SettingsAbout
+from src.hardware import Display, RotaryEncoder, HeartSensor
+from src.view import View
+from src.pico_network import PicoNetwork
+from src.main_menu import MainMenu
+from src.measure import MeasureWait, Measure
+from src.measure_analysis import MeasureResultCheck, HRVAnalysis, KubiosAnalysis
+from src.result import ShowHistory, ShowResult
+from src.settings import Settings, SettingsDebugInfo, SettingsWifi, SettingsMqtt, SettingsAbout
 
 
 class StateMachine:

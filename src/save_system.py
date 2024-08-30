@@ -1,6 +1,6 @@
 import os
 import json
-from utils import GlobalSettings, pico_rom_stat
+from src.utils import GlobalSettings, pico_rom_stat
 
 
 def check_file_nr():

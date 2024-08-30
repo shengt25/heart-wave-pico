@@ -1,6 +1,6 @@
 import time
 import framebuf
-from hardware import Display
+from src.hardware import Display
 
 
 class PowerOnAnimation:

@@ -1,6 +1,6 @@
 import time
-from state import State
-from utils import print_log
+from src.state import State
+from src.utils import print_log
 
 
 class MainMenu(State):
