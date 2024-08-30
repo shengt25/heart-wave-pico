@@ -22,7 +22,7 @@ if __name__ == "__main__":
     load_settings("config.json")
     GlobalSettings.print_log = False
     # init state machine
-    state_machine = StateMachine(heart_sensor_pin=26)
+    state_machine = StateMachine()
     state_machine.preload_states()
     # connect wlan
     if GlobalSettings.wifi_auto_connect:

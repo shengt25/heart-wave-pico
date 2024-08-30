@@ -47,10 +47,10 @@ class StateMachine:
                   STATE_SETTINGS_ABOUT: SettingsAbout,
                   }
 
-    def __init__(self, heart_sensor_pin=26):
-        self.display = Display(refresh_rate=40)
-        self.rotary_encoder = RotaryEncoder(btn_debounce_ms=50)
-        self.heart_sensor = HeartSensor(pin=heart_sensor_pin, sampling_rate=250)
+    def __init__(self):
+        self.display = Display()
+        self.rotary_encoder = RotaryEncoder()
+        self.heart_sensor = HeartSensor()
         self.view = View(self.display)
         self.data_network = PicoNetwork()
         self.current_module = self.MODULE_MENU
