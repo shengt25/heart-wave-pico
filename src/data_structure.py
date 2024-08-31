@@ -1,4 +1,4 @@
-from lib.fifo import Fifo as Fifo_
+from fifo import Fifo as Fifo_
 import array
 
 

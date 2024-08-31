@@ -1,7 +1,7 @@
 import array
-from resources.pic_icon import icon_hr, icon_hrv, icon_kubios, icon_history, icon_settings
+from src.res.pic_icon import icon_hr, icon_hrv, icon_kubios, icon_history, icon_settings
 import framebuf
-from utils import print_log
+from src.utils import print_log
 import os
 
 

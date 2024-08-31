@@ -1,7 +1,7 @@
-from utils import print_log
+from src.utils import print_log
 import time
-from state import State
-from data_processing import IBICalculator
+from src.state import State
+from src.data_processing import IBICalculator
 
 
 class MeasureWait(State):

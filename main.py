@@ -5,7 +5,7 @@ power_on_animation = True
 if power_on_animation:
     import gc
 
-    from resources.animation_power_on import PowerOnAnimation
+    from src.res.animation_power_on import PowerOnAnimation
 
     power_on_animation = PowerOnAnimation()
     power_on_animation.play()
@@ -13,16 +13,16 @@ if power_on_animation:
     gc.collect()
 """end of animation, resources of animation are freed inside the function"""
 
-from utils import GlobalSettings, load_settings
-from state_machine import StateMachine
-from save_system import check_home_dir
+from src.utils import GlobalSettings, load_settings
+from src.state_machine import StateMachine
+from src.save_system import check_home_dir
 
 if __name__ == "__main__":
     # load settings:
     load_settings("config.json")
     GlobalSettings.print_log = False
     # init state machine
-    state_machine = StateMachine(heart_sensor_pin=26)
+    state_machine = StateMachine()
     state_machine.preload_states()
     # connect wlan
     if GlobalSettings.wifi_auto_connect:

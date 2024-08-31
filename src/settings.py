@@ -1,7 +1,7 @@
 import time
-from utils import print_log, pico_stat, pico_rom_stat
-from state import State
-from resources.pic_loading_circle import LoadingCircle
+from src.utils import pico_stat
+from src.state import State
+from src.res.pic_loading_circle import LoadingCircle
 import framebuf
 
 

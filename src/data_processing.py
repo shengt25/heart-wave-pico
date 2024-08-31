@@ -1,9 +1,8 @@
-from utils import print_log, get_datetime, GlobalSettings
+from src.utils import print_log, get_datetime, GlobalSettings
 from math import sqrt
 import urequests as requests
-from data_structure import Fifo
+from src.data_structure import Fifo, SlidingWindow
 import gc
-from data_structure import SlidingWindow
 import random
 
 
