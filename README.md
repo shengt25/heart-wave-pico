@@ -59,7 +59,7 @@ Heartwave Pico is a portable Heart Rate Variability (HRV) analysis device based 
 2. Clone the repository
 
    ```
-   git clone --recurse-submodules https://github.com/shengt25/Heart-Wave-pico.git
+   git clone --recurse-submodules https://github.com/shengt25/heart-wave-pico.git
    ```
 
 3. [Optional] Configure settings:
