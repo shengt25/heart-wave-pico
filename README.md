@@ -71,12 +71,12 @@ Heartwave Pico is a portable Heart Rate Variability (HRV) analysis device based 
    for Linux or MacOS:
 
    ```
-   cd Heart-Wave-pico && ./install.sh
+   cd heart-wave-pico && ./install.sh
    ```
    for Windows:
    
    ```
-   cd Heart-Wave-pico && .\install.cmd
+   cd heart-wave-pico && .\install.cmd
    ```
 5. Restart the Raspberry Pi Pico W and it should be ready to use.
 
