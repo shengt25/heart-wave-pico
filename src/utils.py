@@ -3,6 +3,7 @@ import os
 import gc
 import machine
 import json
+import random
 
 
 class GlobalSettings:
@@ -83,3 +84,18 @@ def ntp_timestamp_to_datetime(ntp_seconds):
     year = tm[0] % 100  # only last 2 digits
     datetime = "{:02d}.{:02d}.{} {:02d}:{:02d}:{:02d}".format(tm[2], tm[1], year, tm[3], tm[4], tm[5])
     return datetime
+
+
+def get_random_name():
+    name_list = [
+        "Leona Golden",
+        "Amias Poole",
+        "Bonnie Lucero",
+        "Felipe Morales",
+        "Skylar Leonard",
+        "Ricardo Combs",
+        "Irene Holt",
+        "Niko Bishop"
+    ]
+    index = random.randint(0, len(name_list) - 1)
+    return name_list[index]
