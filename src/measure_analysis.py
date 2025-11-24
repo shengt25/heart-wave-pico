@@ -1,5 +1,5 @@
 import time
-from src.utils import get_datetime
+from src.utils import get_datetime, get_ntp_timestamp
 from src.result import dict2show_items
 from src.save_system import save_system
 from src.state import State
@@ -75,7 +75,8 @@ class HRVAnalysis(State):
                   "HR": str(hr) + "BPM",
                   "IBI": str(ppi) + "ms",
                   "RMSSD": str(rmssd) + "ms",
-                  "SDNN": str(sdnn) + "ms"}
+                  "SDNN": str(sdnn) + "ms",
+                  "NTP_TIMESTAMP: ": get_ntp_timestamp()}
         save_system(result)
         show_items = dict2show_items(result)
         # send to mqtt
