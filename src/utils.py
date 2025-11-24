@@ -69,3 +69,17 @@ def get_datetime():
     return datetime
 
 
+def get_ntp_timestamp():
+    rtc = machine.RTC()
+    dt = rtc.datetime()
+    unix_time = time.mktime((dt[0], dt[1], dt[2], dt[4], dt[5], dt[6], 0, 0))
+    ntp_seconds = unix_time + 2208988800
+    return ntp_seconds
+
+
+def ntp_timestamp_to_datetime(ntp_seconds):
+    unix_time = ntp_seconds - 2208988800
+    tm = time.localtime(unix_time)
+    year = tm[0] % 100  # only last 2 digits
+    datetime = "{:02d}.{:02d}.{} {:02d}:{:02d}:{:02d}".format(tm[2], tm[1], year, tm[3], tm[4], tm[5])
+    return datetime
