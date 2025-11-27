@@ -1,9 +1,9 @@
 {
   "urls": [
-    ["lib/fifo.py", "http://localhost:8000/src/pico-lib/fifo.py"],
-    ["lib/piotimer.py", "http://localhost:8000/src/pico-lib/piotimer.py"],
-    ["lib/ssd1306.mpy", "http://localhost:8000/src/pico-lib/ssd1306.mpy"],
-    ["lib/umqtt/simple.mpy", "http://localhost:8000/src/pico-lib/umqtt/simple.mpy"],
+    ["lib/fifo.py", "http://localhost:8000/src/lib/fifo.py"],
+    ["lib/piotimer.py", "http://localhost:8000/src/lib/piotimer.py"],
+    ["lib/ssd1306.mpy", "http://localhost:8000/src/lib/ssd1306.mpy"],
+    ["lib/umqtt/simple.mpy", "http://localhost:8000/src/lib/umqtt/simple.mpy"],
 
     ["main.py", "http://localhost:8000/main.py"],
     ["config.json", "http://localhost:8000/config.json"],
