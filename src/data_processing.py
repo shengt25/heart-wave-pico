@@ -138,17 +138,6 @@ def calculate_hrv(IBI_list_raw):
     average_HR /= len(IBI_list)
     average_HR = 60000 / average_HR
 
-    # this is calculating the max-min difference of the IBI list, which is not PPI
-    # # PPI
-    # minimum = 9999999
-    # maximum = 0
-    # for beat in IBI_list:
-    #     if beat > maximum:
-    #         maximum = beat
-    #     if beat < minimum:
-    #         minimum = beat
-    # PPI = maximum - minimum
-
     # PPI
     mean_ibi = 0
     for ibi in IBI_list:
