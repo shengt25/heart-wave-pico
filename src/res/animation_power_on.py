@@ -2135,7 +2135,6 @@ class PowerOnAnimation:
             buf_pico = framebuf.FrameBuffer(self.seq[i], 61, 29, framebuf.MONO_VLSB)
             display.blit(buf_pico, 63, 32)
             display.show()
-        time.sleep_ms(500)
 
         buf_heart = framebuf.FrameBuffer(self._power_on_heart, 15, 13, framebuf.MONO_VLSB)
         display.blit(buf_heart, 23, 40)
