@@ -1,5 +1,5 @@
 import time
-from src.utils import get_datetime, get_ntp_timestamp
+from src.utils import get_datetime, get_ntp_timestamp, get_random_name
 from src.result import dict2show_items
 from src.save_system import save_system
 from src.state import State
@@ -71,7 +71,8 @@ class HRVAnalysis(State):
         hr, ppi, rmssd, sdnn = calculate_hrv(ibi_list)
         self._display.fill_rect(0, 14, 128, 50, 0)  # clear loading animation
         # save data
-        result = {"DATE": get_datetime(),
+        result = {"NAME": get_random_name(),
+                  "DATE": get_datetime(),
                   "HR": str(hr) + "BPM",
                   "IBI": str(ppi) + "ms",
                   "RMSSD": str(rmssd) + "ms",

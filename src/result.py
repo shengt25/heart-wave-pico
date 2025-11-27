@@ -90,16 +90,20 @@ class ShowResult(State):
 
 def dict2show_items(dict_data):
     list_data = []
-    # history data: date time.
-    list_data = ["Date:" + str(dict_data["DATE"][:8]),
-                 "Time:" + str(dict_data["DATE"][9:17])]
 
-    # common data: in the middle
+    # patient name
+    list_data.append(str(dict_data["NAME"]))
+
+    # date time.
+    list_data.extend(["Date:" + str(dict_data["DATE"][:8]),
+                      "Time:" + str(dict_data["DATE"][9:17])])
+
+    # hrv data
     list_data.extend(["HR:" + str(dict_data["HR"]),
                       "IBI:" + str(dict_data["IBI"]),
                       "RMSSD:" + str(dict_data["RMSSD"]),
                       "SDNN:" + str(dict_data["SDNN"])])
-    # kubios data: at the end
+    # kubios data after hrv data if any
     if "SNS" in dict_data:
         list_data.extend(["SNS:" + str(dict_data["SNS"]),
                           "PNS:" + str(dict_data["PNS"]),
