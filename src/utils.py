@@ -52,6 +52,7 @@ def load_settings(filename):
             GlobalSettings.wifi_password = settings["wifi_password"]
             GlobalSettings.wifi_auto_connect = settings["wifi_auto_connect"]
             GlobalSettings.mqtt_broker_ip = settings["mqtt_broker_ip"]
+            GlobalSettings.print_log = settings["print_log"]
     except OSError:
         raise OSError("config file not found in the root directory.")
 

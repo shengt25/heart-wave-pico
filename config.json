@@ -3,5 +3,6 @@
     "wifi_ssid": "",
     "wifi_password": "",
     "wifi_auto_connect": true,
-    "mqtt_broker_ip": ""
+    "mqtt_broker_ip": "",
+    "print_log": false
 }
