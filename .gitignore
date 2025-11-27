@@ -8,3 +8,6 @@
 uv.lock
 pyproject.toml
 .venv
+
+# config
+config.json
