@@ -25,7 +25,8 @@ class PicoNetwork:
             self._mqtt_client.subscribe(b"kubios/response")
             self._kubios_response = None
             self._response_received = False
-        except:
+        except Exception as e:
+            print_log(f"MQTT connect failed: {e}")
             return False
         return True
 
@@ -36,7 +37,8 @@ class PicoNetwork:
         message = json.dumps(measurement)
         try:
             self._mqtt_client.publish(topic, message)
-        except:
+        except Exception as e:
+            print_log(f"MQTT publish failed: {e}")
             return False
         return True
 
@@ -57,8 +59,9 @@ class PicoNetwork:
 
     def is_mqtt_connected(self):
         try:
-            self._mqtt_client.publish("hwp/test", "test connection")
-        except:
+            self._mqtt_client.ping()
+        except Exception as e:
+            print_log(f"MQTT connection check failed: {e}")
             return False
         return True
 
@@ -68,7 +71,8 @@ class PicoNetwork:
             try:
                 self._kubios_response = json.loads(msg)
                 self._response_received = True
-            except:
+            except Exception as e:
+                print_log(f"Failed to parse Kubios response: {e}")
                 self._kubios_response = None
                 self._response_received = False
 
@@ -100,7 +104,8 @@ class PicoNetwork:
             # Clear stale response if any
             self._kubios_response = None
             self._response_received = False
-        except:
+        except Exception as e:
+            print_log(f"Kubios request publish failed: {e}")
             return False
         return True
 
@@ -112,7 +117,8 @@ class PicoNetwork:
         # Check for new MQTT messages (triggers callback)
         try:
             self._mqtt_client.check_msg()
-        except:
+        except Exception as e:
+            print_log(f"MQTT check_msg failed: {e}")
             pass
 
         # Return and consume response if available
