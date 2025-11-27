@@ -1,6 +1,5 @@
-from src.utils import print_log
 import time
-from src.state import State
+from src.state.state import State
 from src.data_processing import IBICalculator
 
 

@@ -1,5 +1,4 @@
-from src.utils import print_log, GlobalSettings
-from src.state import State
+from src.state.state import State
 from src.save_system import load_history_list, load_history_data
 
 

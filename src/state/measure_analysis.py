@@ -1,8 +1,8 @@
 import time
 from src.utils import get_datetime, get_ntp_timestamp, get_random_name
-from src.result import dict2show_items
+from src.state.result import dict2show_items
 from src.save_system import save_system
-from src.state import State
+from src.state.state import State
 from src.data_processing import calculate_hrv, get_kubios_analysis
 from src.res.pic_loading_circle import LoadingCircle
 import framebuf
