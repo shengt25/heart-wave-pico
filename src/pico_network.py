@@ -97,6 +97,9 @@ class PicoNetwork:
         message = json.dumps(payload)
         try:
             self._mqtt_client.publish(topic, message)
+            # Clear stale response if any
+            self._kubios_response = None
+            self._response_received = False
         except:
             return False
         return True
@@ -109,9 +112,6 @@ class PicoNetwork:
         # Check for new MQTT messages (triggers callback)
         try:
             self._mqtt_client.check_msg()
-            # Clear stale response if any
-            self._kubios_response = None
-            self._response_received = False
         except:
             pass
 
