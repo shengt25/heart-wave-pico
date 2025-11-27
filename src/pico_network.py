@@ -20,7 +20,7 @@ class PicoNetwork:
 
     def connect_mqtt(self):
         try:
-            self._mqtt_client.connect(clean_session=True)
+            self._mqtt_client.connect(clean_session=True, timeout=0.2)
             self._mqtt_client.set_callback(self._mqtt_message_callback)
             self._mqtt_client.subscribe(b"kubios/response")
             self._kubios_response = None
