@@ -20,7 +20,6 @@ from src.save_system import check_home_dir
 if __name__ == "__main__":
     # load settings:
     load_settings("config.json")
-    GlobalSettings.print_log = False
     # init state machine
     state_machine = StateMachine()
     state_machine.preload_states()
