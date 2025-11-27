@@ -2,6 +2,7 @@ from src.utils import print_log, get_datetime, get_random_name, GlobalSettings
 from math import sqrt
 from src.data_structure import Fifo, SlidingWindow
 import time
+import json
 
 
 class IBICalculator:
@@ -188,7 +189,9 @@ def get_kubios_analysis(ibi_list, pico_network, timeout_ms=10000):
             "analysis": {"type": "readiness"}
         }
 
-        success = pico_network.send_kubios_request(request_payload)
+        topic = "kubios/request"
+        message = json.dumps(request_payload)
+        success = pico_network.mqtt_publish(topic, message)
         if not success:
             print_log("Kubios MQTT publish failed")
             return False, None
@@ -199,7 +202,7 @@ def get_kubios_analysis(ibi_list, pico_network, timeout_ms=10000):
         start_time = time.ticks_ms()
         while time.ticks_diff(time.ticks_ms(), start_time) < timeout_ms:
             # Check for new MQTT messages and try to get response
-            response = pico_network.get_kubios_response()
+            response = pico_network.get_mqtt_response("kubios/response")
             if response:
                 # Verify MAC address matches
                 if response.get("mac") == device_mac:
