@@ -14,9 +14,6 @@ class GlobalSettings:
     wifi_password = ""
     wifi_auto_connect = False
     mqtt_broker_ip = ""
-    kubios_apikey = ""
-    kubios_client_id = ""
-    kubios_client_secret = ""
 
 
 def print_log(message):
@@ -55,9 +52,6 @@ def load_settings(filename):
             GlobalSettings.wifi_password = settings["wifi_password"]
             GlobalSettings.wifi_auto_connect = settings["wifi_auto_connect"]
             GlobalSettings.mqtt_broker_ip = settings["mqtt_broker_ip"]
-            GlobalSettings.kubios_apikey = settings["kubios_apikey"]
-            GlobalSettings.kubios_client_id = settings["kubios_client_id"]
-            GlobalSettings.kubios_client_secret = settings["kubios_client_secret"]
     except OSError:
         raise OSError("config file not found in the root directory.")
 

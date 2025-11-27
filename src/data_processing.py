@@ -1,9 +1,7 @@
-from src.utils import print_log, get_datetime, GlobalSettings
+from src.utils import print_log, get_datetime, get_random_name, GlobalSettings
 from math import sqrt
-import urequests as requests
 from src.data_structure import Fifo, SlidingWindow
-import gc
-import random
+import time
 
 
 class IBICalculator:
@@ -168,44 +166,74 @@ def calculate_hrv(IBI_list_raw):
     return round(average_HR, 2), round(mean_ibi, 2), round(RMSSD, 2), round(SDNN, 2)
 
 
-def get_kubios_analysis(ibi_list):
-    """Return: tuple(success, response)"""
-    # run gc.collect() to free up memory, otherwise the 'requests' might fail due to it probably using a lot of memory
-    gc.collect()
-    print_log("RAM before garbage: " + str(round((gc.mem_free() / 1024), 2)) + " KB")
-    amount = random.randint(10, 30)
-    garbage = [i for i in range(amount)]
-    print_log("RAM after garbage: " + str(round((gc.mem_free() / 1024), 2)) + " KB")
-    print_log("RAM before kubios request: " + str(round((gc.mem_free() / 1024), 2)) + " KB")
+def get_kubios_analysis(ibi_list, pico_network, timeout_ms=10000):
+    """
+    Perform Kubios analysis via MQTT request-response.
+
+    Args:
+        ibi_list: List of inter-beat intervals in milliseconds
+        pico_network: Reference to PicoNetwork instance
+        timeout_ms: Maximum time to wait for response (default: 10000ms)
+
+    Returns:
+        tuple(success: bool, result: dict or None)
+    """
+    device_mac = pico_network.get_mac_address()
     try:
-        APIKEY = GlobalSettings.kubios_apikey
-        CLIENT_ID = GlobalSettings.kubios_client_id
-        CLIENT_SECRET = GlobalSettings.kubios_client_secret
-        TOKEN_URL = "https://kubioscloud.auth.eu-west-1.amazoncognito.com/oauth2/token"
-        response = requests.post(url=TOKEN_URL, data='grant_type=client_credentials&client_id={}'.format(CLIENT_ID),
-                                 headers={'Content-Type': 'application/x-www-form-urlencoded'},
-                                 auth=(CLIENT_ID, CLIENT_SECRET))
-        gc.collect()
-        response = response.json()  # Parse JSON response into a python dictionary
-        print_log("RAM after the first kubios request: " + str(round((gc.mem_free() / 1024), 2)) + " KB")
-        access_token = response["access_token"]  # Parse access token
-        dataset = {"type": "RRI", "data": ibi_list, "analysis": {"type": "readiness"}}
-        response = requests.post(url="https://analysis.kubioscloud.com/v2/analytics/analyze",
-                                 headers={"Authorization": "Bearer {}".format(access_token), "X-Api-Key": APIKEY},
-                                 json=dataset)
-        analysis = response.json()["analysis"]
-        print_log("RAM after the second kubios request: " + str(round((gc.mem_free() / 1024), 2)) + " KB")
-        result = {"DATE": get_datetime(),
-                  "HR": str(round(analysis["mean_hr_bpm"], 2)) + "BPM",
-                  "IBI": str(round(analysis["mean_rr_ms"], 2)) + "ms",
-                  "RMSSD": str(round(analysis["rmssd_ms"], 2)) + "ms",
-                  "SDNN": str(round(analysis["sdnn_ms"], 2)) + "ms",
-                  "SNS": str(round(analysis["sns_index"], 2)),
-                  "PNS": str(round(analysis["pns_index"], 2)),
-                  "STRESS": str(round(analysis["stress_index"], 2))}
+        # Build and publish request
+        request_payload = {
+            "mac": device_mac,
+            "type": "RRI",
+            "data": ibi_list,
+            "analysis": {"type": "readiness"}
+        }
+
+        success = pico_network.send_kubios_request(request_payload)
+        if not success:
+            print_log("Kubios MQTT publish failed")
+            return False, None
+
+        print_log("Kubios request sent, waiting for response...")
+
+        # Blocking wait for response with timeout
+        start_time = time.ticks_ms()
+        while time.ticks_diff(time.ticks_ms(), start_time) < timeout_ms:
+            # Check for new MQTT messages and try to get response
+            response = pico_network.get_kubios_response()
+            if response:
+                # Verify MAC address matches
+                if response.get("mac") == device_mac:
+                    # Verify status is ok
+                    if response.get("data", {}).get("status") != "ok":
+                        print_log("Kubios analysis failed: status not ok")
+                        return False, None
+
+                    # Extract analysis data
+                    analysis = response.get("data", {}).get("analysis", {})
+
+                    result = {
+                        "NAME": get_random_name(),
+                        "DATE": get_datetime(),
+                        "HR": str(round(analysis["mean_hr_bpm"], 2)) + "BPM",
+                        "IBI": str(round(analysis["mean_rr_ms"], 2)) + "ms",
+                        "RMSSD": str(round(analysis["rmssd_ms"], 2)) + "ms",
+                        "SDNN": str(round(analysis["sdnn_ms"], 2)) + "ms",
+                        "SNS": str(round(analysis["sns_index"], 2)),
+                        "PNS": str(round(analysis["pns_index"], 2)),
+                        "STRESS": str(round(analysis["stress_index"], 2))
+                    }
+                    return True, result
+                else:
+                    # MAC mismatch, ignore
+                    print_log(f"MAC mismatch: expected {device_mac}, got {response.get('mac')}")
+
+            # Small delay to reduce CPU usage during wait
+            time.sleep_ms(50)
+
+        # Timeout reached
+        print_log("Kubios analysis timeout")
+        return False, None
+
     except Exception as e:
         print_log(f"Kubios analysis failed: {e}")
-        del garbage
         return False, None
-    del garbage
-    return True, result

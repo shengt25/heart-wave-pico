@@ -115,7 +115,7 @@ class KubiosAnalysis(State):
                 ani_index = (ani_index + 1) % len(loading_circle.seq)
                 ani_refresh_time = time.ticks_ms()
         """end of loading animation"""
-        kubios_success, result = get_kubios_analysis(self._ibi_list)
+        kubios_success, result = get_kubios_analysis(self._ibi_list, self._state_machine.data_network, timeout_ms=10000)
         self._display.fill_rect(0, 14, 128, 50, 0)  # clear loading animation
         if kubios_success:
             # success, save and goto show result
