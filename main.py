@@ -15,7 +15,6 @@ if power_on_animation:
 
 from src.utils import GlobalSettings, load_settings
 from src.state_machine import StateMachine
-from src.save_system import check_home_dir
 
 if __name__ == "__main__":
     # load settings:
@@ -26,9 +25,7 @@ if __name__ == "__main__":
     # connect wlan
     if GlobalSettings.wifi_auto_connect:
         state_machine.data_network.connect_wlan()
-    # start from main menu
-    state_machine.set(state_code=state_machine.STATE_MENU)
-    # check for save directory
-    check_home_dir()
+    # start from user selection
+    state_machine.set(state_code=state_machine.STATE_USER_SELECT)
     while True:
         state_machine.run()

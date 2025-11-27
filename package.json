@@ -7,6 +7,7 @@
 
         ["main.py", "http://localhost:8000/main.py"],
         ["config.json", "http://localhost:8000/config.json"],
+        ["users.json", "http://localhost:8000/users.json"],
 
         ["src/data_processing.py", "http://localhost:8000/src/data_processing.py"],
         ["src/data_structure.py", "http://localhost:8000/src/data_structure.py"],
@@ -23,6 +24,7 @@
         ["src/state/result.py", "http://localhost:8000/src/state/result.py"],
         ["src/state/settings.py", "http://localhost:8000/src/state/settings.py"],
         ["src/state/state.py", "http://localhost:8000/src/state/state.py"],
+        ["src/state/user.py", "http://localhost:8000/src/state/user.py"],
 
         ["src/res/animation_power_on.py", "http://localhost:8000/src/res/animation_power_on.py"],
         ["src/res/pic_icon.py", "http://localhost:8000/src/res/pic_icon.py"],

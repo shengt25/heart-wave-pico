@@ -15,7 +15,8 @@ class ShowHistory(State):
         # load data
         self._history_dates.clear()
         self._history_dates.append("Back")
-        files = load_history_list()
+        user_id = self._state_machine.get_context('user_id')
+        files = load_history_list(user_id)
         self._history_dates.extend(files)
         # ui
         self._view.add_text(text="History", x=0, y=0, invert=True)
@@ -49,7 +50,8 @@ class ShowHistory(State):
                 self._rotary_encoder.disable_rotate()
                 self._view.remove(self._listview_history_list)
                 # set state to show data, and pass the data
-                data = load_history_data(self._history_dates[self._selection])
+                user_id = self._state_machine.get_context('user_id')
+                data = load_history_data(self._history_dates[self._selection], user_id)
                 show_items = dict2show_items(data)
                 self._state_machine.set(state_code=self._state_machine.STATE_SHOW_RESULT,
                                         args=[show_items])

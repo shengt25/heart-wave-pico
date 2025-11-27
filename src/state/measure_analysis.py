@@ -1,5 +1,5 @@
 import time
-from src.utils import get_datetime, get_ntp_timestamp, get_random_name
+from src.utils import get_datetime, get_ntp_timestamp, get_user_name_by_id
 from src.state.result import dict2show_items
 from src.save_system import save_system
 from src.state.state import State
@@ -72,14 +72,15 @@ class HRVAnalysis(State):
         hr, ppi, rmssd, sdnn = calculate_hrv(ibi_list)
         self._display.fill_rect(0, 14, 128, 50, 0)  # clear loading animation
         # save data
-        result = {"NAME": get_random_name(),
+        user_id = self._state_machine.get_context('user_id')
+        result = {"NAME": get_user_name_by_id(user_id),
                   "DATE": get_datetime(),
                   "HR": str(hr) + "BPM",
                   "IBI": str(ppi) + "ms",
                   "RMSSD": str(rmssd) + "ms",
                   "SDNN": str(sdnn) + "ms",
                   "NTP_TIMESTAMP: ": get_ntp_timestamp()}
-        save_system(result)
+        save_system(result, user_id)
         show_items = dict2show_items(result)
         # send to mqtt
         measurement = {"mean_hr": result["HR"], "mean_ppi": result["IBI"],
@@ -120,11 +121,12 @@ class KubiosAnalysis(State):
                 ani_index = (ani_index + 1) % len(loading_circle.seq)
                 ani_refresh_time = time.ticks_ms()
         """end of loading animation"""
-        kubios_success, result = get_kubios_analysis(self._ibi_list, self._state_machine.data_network, timeout_ms=10000)
+        user_id = self._state_machine.get_context('user_id')
+        kubios_success, result = get_kubios_analysis(self._ibi_list, self._state_machine.data_network, user_id, timeout_ms=10000)
         self._display.fill_rect(0, 14, 128, 50, 0)  # clear loading animation
         if kubios_success:
             # success, save and goto show result
-            save_system(result)
+            save_system(result, user_id)
             show_items = dict2show_items(result)
             # send to mqtt
             measurement = {"mean_hr": result["HR"], "mean_ppi": result["IBI"],

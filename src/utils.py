@@ -83,16 +83,39 @@ def ntp_timestamp_to_datetime(ntp_seconds):
     return datetime
 
 
-def get_random_name():
-    name_list = [
-        "Leona Golden",
-        "Amias Poole",
-        "Bonnie Lucero",
-        "Felipe Morales",
-        "Skylar Leonard",
-        "Ricardo Combs",
-        "Irene Holt",
-        "Niko Bishop"
-    ]
-    index = random.randint(0, len(name_list) - 1)
-    return name_list[index]
+def load_users_list():
+    """Load users from users.json file.
+    Returns a dictionary of {id: name} pairs.
+    If file doesn't exist or is malformed, creates a default file.
+
+    Returns:
+        dict: Dictionary mapping user IDs to names
+    """
+    filename = "users.json"
+    try:
+        with open(filename, "r") as file:
+            users = json.load(file)
+            # Validate structure
+            if not isinstance(users, dict):
+                raise ValueError("users.json must contain a dictionary")
+            for key, value in users.items():
+                if not isinstance(key, str) or not isinstance(value, str):
+                    raise ValueError("Keys and values must be strings")
+            return users
+    except Exception as e:
+        print_log(f"users.json error ({e})")
+
+def get_user_name_by_id(user_id):
+    """Get user name from ID by loading users.json.
+
+    Args:
+        user_id (str): The user ID to lookup
+
+    Returns:
+        str: The user name, or "Unknown User" if ID not found
+    """
+    try:
+        users = load_users_list()
+        return users.get(user_id, "Unknown User")
+    except OSError:
+        return "Unknown User"

@@ -1,4 +1,4 @@
-from src.utils import print_log, get_datetime, get_random_name, GlobalSettings
+from src.utils import print_log, get_datetime, get_user_name_by_id, GlobalSettings
 from math import sqrt
 from src.data_structure import Fifo, SlidingWindow
 import time
@@ -167,7 +167,7 @@ def calculate_hrv(IBI_list_raw):
     return round(average_HR, 2), round(mean_ibi, 2), round(RMSSD, 2), round(SDNN, 2)
 
 
-def get_kubios_analysis(ibi_list, pico_network, timeout_ms=10000):
+def get_kubios_analysis(ibi_list, pico_network, user_id, timeout_ms=10000):
     """
     Perform Kubios analysis via MQTT request-response.
 
@@ -215,7 +215,7 @@ def get_kubios_analysis(ibi_list, pico_network, timeout_ms=10000):
                     analysis = response.get("data", {}).get("analysis", {})
 
                     result = {
-                        "NAME": get_random_name(),
+                        "NAME": get_user_name_by_id(user_id),
                         "DATE": get_datetime(),
                         "HR": str(round(analysis["mean_hr_bpm"], 2)) + "BPM",
                         "IBI": str(round(analysis["mean_rr_ms"], 2)) + "ms",
