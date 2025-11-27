@@ -1,5 +1,5 @@
 import time
-from src.utils import get_datetime
+from src.utils import get_datetime, get_ntp_timestamp, get_random_name
 from src.result import dict2show_items
 from src.save_system import save_system
 from src.state import State
@@ -71,11 +71,13 @@ class HRVAnalysis(State):
         hr, ppi, rmssd, sdnn = calculate_hrv(ibi_list)
         self._display.fill_rect(0, 14, 128, 50, 0)  # clear loading animation
         # save data
-        result = {"DATE": get_datetime(),
+        result = {"NAME": get_random_name(),
+                  "DATE": get_datetime(),
                   "HR": str(hr) + "BPM",
                   "IBI": str(ppi) + "ms",
                   "RMSSD": str(rmssd) + "ms",
-                  "SDNN": str(sdnn) + "ms"}
+                  "SDNN": str(sdnn) + "ms",
+                  "NTP_TIMESTAMP: ": get_ntp_timestamp()}
         save_system(result)
         show_items = dict2show_items(result)
         # send to mqtt
@@ -113,7 +115,7 @@ class KubiosAnalysis(State):
                 ani_index = (ani_index + 1) % len(loading_circle.seq)
                 ani_refresh_time = time.ticks_ms()
         """end of loading animation"""
-        kubios_success, result = get_kubios_analysis(self._ibi_list)
+        kubios_success, result = get_kubios_analysis(self._ibi_list, self._state_machine.data_network, timeout_ms=10000)
         self._display.fill_rect(0, 14, 128, 50, 0)  # clear loading animation
         if kubios_success:
             # success, save and goto show result

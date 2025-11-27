@@ -51,7 +51,7 @@ class ShowHistory(State):
                 self._view.remove(self._listview_history_list)
                 # set state to show data, and pass the data
                 data = load_history_data(self._history_dates[self._selection])
-                show_items = dict2show_items(data, show_datetime=True)
+                show_items = dict2show_items(data)
                 self._state_machine.set(state_code=self._state_machine.STATE_SHOW_RESULT,
                                         args=[show_items])
 
@@ -88,18 +88,22 @@ class ShowResult(State):
                 raise ValueError("Undefined result showing module")
 
 
-def dict2show_items(dict_data, show_datetime=False):
+def dict2show_items(dict_data):
     list_data = []
-    # history data: date time first
-    if show_datetime:
-        list_data = ["Date:" + str(dict_data["DATE"][:8]),
-                     "Time:" + str(dict_data["DATE"][9:17])]
-    # common data: in the middle
+
+    # patient name
+    list_data.append(str(dict_data["NAME"]))
+
+    # date time.
+    list_data.extend(["Date:" + str(dict_data["DATE"][:8]),
+                      "Time:" + str(dict_data["DATE"][9:17])])
+
+    # hrv data
     list_data.extend(["HR:" + str(dict_data["HR"]),
                       "IBI:" + str(dict_data["IBI"]),
                       "RMSSD:" + str(dict_data["RMSSD"]),
                       "SDNN:" + str(dict_data["SDNN"])])
-    # kubios data: at the end
+    # kubios data after hrv data if any
     if "SNS" in dict_data:
         list_data.extend(["SNS:" + str(dict_data["SNS"]),
                           "PNS:" + str(dict_data["PNS"]),

@@ -1,0 +1,10 @@
+# os generated
+.DS_Store
+
+# ide generated
+.idea/
+
+# uv related
+uv.lock
+pyproject.toml
+.venv
