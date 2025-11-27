@@ -3,7 +3,6 @@ import os
 import gc
 import machine
 import json
-import random
 
 
 class GlobalSettings:
