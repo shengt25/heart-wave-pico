@@ -7,7 +7,7 @@ import random
 
 
 class GlobalSettings:
-    print_log = False
+    debug_print = False
     save_directory = "Saved_Values"
     files_limit = 1000
     wifi_ssid = ""
@@ -17,7 +17,7 @@ class GlobalSettings:
 
 
 def print_log(message):
-    if GlobalSettings.print_log:
+    if GlobalSettings.debug_print:
         print(time.ticks_ms(), message)
 
 
@@ -52,7 +52,7 @@ def load_settings(filename):
             GlobalSettings.wifi_password = settings["wifi_password"]
             GlobalSettings.wifi_auto_connect = settings["wifi_auto_connect"]
             GlobalSettings.mqtt_broker_ip = settings["mqtt_broker_ip"]
-            GlobalSettings.print_log = settings["print_log"]
+            GlobalSettings.debug_print = settings["debug_print"]
     except OSError:
         raise OSError("config file not found in the root directory.")
 
