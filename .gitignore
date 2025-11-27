@@ -11,3 +11,4 @@ pyproject.toml
 
 # config
 config.json
+users.json
