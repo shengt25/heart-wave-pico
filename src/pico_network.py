@@ -30,7 +30,7 @@ class PicoNetwork:
             return False
         return True
 
-    def mqtt_publish(self, result):
+    def mqtt_publish(self, topic, message):
         if GlobalSettings.mqtt_auto_connect:
             if self.is_mqtt_connected():
                 print_log("MQTT already connected")
@@ -53,11 +53,6 @@ class PicoNetwork:
             if not self.is_mqtt_connected():
                 print_log("MQTT not connected and auto connect disabled")
                 return False
-
-        measurement = {"mean_hr": result["HR"], "mean_ppi": result["IBI"],
-                       "rmssd": result["RMSSD"], "sdnn": result["SDNN"]}
-        topic = "hwp/measurement"
-        message = json.dumps(measurement)
         try:
             self._mqtt_client.publish(topic, message)
         except Exception as e:

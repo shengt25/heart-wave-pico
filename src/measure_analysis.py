@@ -6,6 +6,7 @@ from src.state import State
 from src.data_processing import calculate_hrv, get_kubios_analysis
 from src.res.pic_loading_circle import LoadingCircle
 import framebuf
+import json
 
 
 class MeasureResultCheck(State):
@@ -81,7 +82,11 @@ class HRVAnalysis(State):
         save_system(result)
         show_items = dict2show_items(result)
         # send to mqtt
-        mqtt_success = self._state_machine.data_network.mqtt_publish(result)
+        measurement = {"mean_hr": result["HR"], "mean_ppi": result["IBI"],
+                       "rmssd": result["RMSSD"], "sdnn": result["SDNN"]}
+        topic = "hwp/measurement"
+        message = json.dumps(measurement)
+        mqtt_success = self._state_machine.data_network.mqtt_publish(topic, message)
         if not mqtt_success:
             show_items.extend(["---", "MQTT not sent", "Please connect", "in settings"])
         self._state_machine.set(state_code=self._state_machine.STATE_SHOW_RESULT, args=[show_items])
@@ -122,7 +127,11 @@ class KubiosAnalysis(State):
             save_system(result)
             show_items = dict2show_items(result)
             # send to mqtt
-            mqtt_success = self._state_machine.data_network.mqtt_publish(result)
+            measurement = {"mean_hr": result["HR"], "mean_ppi": result["IBI"],
+                           "rmssd": result["RMSSD"], "sdnn": result["SDNN"]}
+            topic = "hwp/measurement"
+            message = json.dumps(measurement)
+            mqtt_success = self._state_machine.data_network.mqtt_publish(topic, message)
             if not mqtt_success:
                 show_items.extend(["---", "MQTT not sent", "Please connect", "in settings"])
             self._state_machine.set(state_code=self._state_machine.STATE_SHOW_RESULT, args=[show_items])
