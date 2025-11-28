@@ -37,7 +37,7 @@ def save_system(data, user_id):
 
     Args:
         data (dict): Measurement data to save
-        user_id (str): User ID (e.g., '001', '002')
+        user_id (int): User ID (e.g., 1, 2, 3)
 
     Returns:
         bool: True if save successful
@@ -60,7 +60,7 @@ def load_history_list(user_id):
     """Load history file list for specific user.
 
     Args:
-        user_id (str): User ID to load history for
+        user_id (int): User ID to load history for
 
     Returns:
         list: List of filenames sorted newest first
@@ -80,7 +80,7 @@ def load_history_data(file_name, user_id):
 
     Args:
         file_name (str): Filename to load
-        user_id (str): User ID who owns this file
+        user_id (int): User ID who owns this file
 
     Returns:
         dict: Measurement data
