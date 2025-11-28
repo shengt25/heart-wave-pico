@@ -123,7 +123,7 @@ class PicoNetwork:
         self._mqtt_response_topic = None
         return response
 
-    def wait_mqtt_response_blocking(self, expected_topic_str, max_retry=3, timeout=5000, polling_interval=50):
+    def wait_mqtt_response_blocking(self, expected_topic_str, max_retry=3, timeout=5000, polling_interval=500):
         """Blocking wait for MQTT response with retries."""
         retry = 0
         while retry < max_retry:
