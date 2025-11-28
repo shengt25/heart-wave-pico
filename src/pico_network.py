@@ -3,7 +3,7 @@ from src.utils import GlobalSettings, print_log
 import json
 from umqtt.simple import MQTTClient
 import ubinascii
-
+import time
 
 class PicoNetwork:
     def __init__(self):
@@ -122,6 +122,20 @@ class PicoNetwork:
         self._mqtt_response_topic = None
         return response
 
+    def wait_mqtt_response_blocking(self, expected_topic_str, max_retry=3, timeout=5000, polling_interval=50):
+        """Blocking wait for MQTT response with retries."""
+        retry = 0
+        while retry < max_retry:
+            start_time = time.ticks_ms()
+            while time.ticks_diff(time.ticks_ms(), start_time) < timeout:
+                response = self.get_mqtt_response(expected_topic_str)
+                if response:
+                    return response
+                time.sleep_ms(polling_interval)
+            retry += 1
+            print_log(f"Retry {retry}/{max_retry} for MQTT response...")
+        print_log("MQTT response timeout")
+        return None
 
     def _mqtt_message_callback(self, topic, msg):
         """Handle incoming MQTT messages."""

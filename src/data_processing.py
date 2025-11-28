@@ -199,38 +199,32 @@ def get_kubios_analysis(ibi_list, pico_network, user_id, timeout_ms=5000):
         print_log("Kubios request sent, waiting for response...")
 
         # Blocking wait for response with timeout
-        start_time = time.ticks_ms()
-        while time.ticks_diff(time.ticks_ms(), start_time) < timeout_ms:
-            # Check for new MQTT messages and try to get response
-            response = pico_network.get_mqtt_response("kubios/response")
-            if response:
-                # Verify status is ok
-                if response.get("data", {}).get("status") != "ok":
-                    print_log("Kubios analysis failed: status not ok")
-                    return False, None
+        response = pico_network.wait_mqtt_response_blocking("kubios/response")
 
-                # Extract analysis data
-                analysis = response.get("data", {}).get("analysis", {})
+        if response:
+            # Verify status is ok
+            if response.get("data", {}).get("status") != "ok":
+                print_log("Kubios analysis failed: status not ok")
+                return False, None
 
-                result = {
-                    "NAME": get_user_name_by_id(user_id),
-                    "DATE": get_datetime(),
-                    "HR": str(round(analysis["mean_hr_bpm"], 2)) + "BPM",
-                    "IBI": str(round(analysis["mean_rr_ms"], 2)) + "ms",
-                    "RMSSD": str(round(analysis["rmssd_ms"], 2)) + "ms",
-                    "SDNN": str(round(analysis["sdnn_ms"], 2)) + "ms",
-                    "SNS": str(round(analysis["sns_index"], 2)),
-                    "PNS": str(round(analysis["pns_index"], 2)),
-                    "STRESS": str(round(analysis["stress_index"], 2))
-                }
-                return True, result
+            # Extract analysis data
+            analysis = response.get("data", {}).get("analysis", {})
 
-            # Small delay to reduce CPU usage during wait
-            time.sleep_ms(50)
-
-        # Timeout reached
-        print_log("Kubios analysis timeout")
-        return False, None
+            result = {
+                "NAME": get_user_name_by_id(user_id),
+                "DATE": get_datetime(),
+                "HR": str(round(analysis["mean_hr_bpm"], 2)) + "BPM",
+                "IBI": str(round(analysis["mean_rr_ms"], 2)) + "ms",
+                "RMSSD": str(round(analysis["rmssd_ms"], 2)) + "ms",
+                "SDNN": str(round(analysis["sdnn_ms"], 2)) + "ms",
+                "SNS": str(round(analysis["sns_index"], 2)),
+                "PNS": str(round(analysis["pns_index"], 2)),
+                "STRESS": str(round(analysis["stress_index"], 2))
+            }
+            return True, result
+        else:
+            print_log("Kubios analysis timeout")
+            return False, None
 
     except Exception as e:
         print_log(f"Kubios analysis failed: {e}")
