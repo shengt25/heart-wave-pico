@@ -101,21 +101,27 @@ class PicoNetwork:
             self._mqtt_client.check_msg()
         except Exception as e:
             print_log(f"MQTT check_msg failed: {e}")
-            pass
+            return None
+
+        if not self._mqtt_response_received:
+            return None
 
         expected_topic = expected_topic_str.encode('utf-8')
-        if self._mqtt_response_received:
-            if self._mqtt_response_topic != expected_topic:
-                print_log(f"Topic mismatch, skipped. Expected {expected_topic}, got {self._mqtt_response_topic}")
-                return None
-            else:
-                response = self._mqtt_response
-                self._mqtt_response = None
-                self._mqtt_response_received = False
-                self._mqtt_response_topic = None
-                return response
-        else:
+        if self._mqtt_response_topic != expected_topic:
+            print_log(f"Topic mismatch, skipped. Expected {expected_topic}, got {self._mqtt_response_topic}")
             return None
+
+        response = self._mqtt_response
+        # Verify MAC address matches
+        if response.get("mac") != self._mac_address:
+            print_log(f"MAC mismatch: expected {self._mac_address}, got {response.get('mac')}")
+            return None
+
+        self._mqtt_response = None
+        self._mqtt_response_received = False
+        self._mqtt_response_topic = None
+        return response
+
 
     def _mqtt_message_callback(self, topic, msg):
         """Handle incoming MQTT messages."""

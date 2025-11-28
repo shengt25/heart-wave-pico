@@ -204,31 +204,26 @@ def get_kubios_analysis(ibi_list, pico_network, user_id, timeout_ms=10000):
             # Check for new MQTT messages and try to get response
             response = pico_network.get_mqtt_response("kubios/response")
             if response:
-                # Verify MAC address matches
-                if response.get("mac") == device_mac:
-                    # Verify status is ok
-                    if response.get("data", {}).get("status") != "ok":
-                        print_log("Kubios analysis failed: status not ok")
-                        return False, None
+                # Verify status is ok
+                if response.get("data", {}).get("status") != "ok":
+                    print_log("Kubios analysis failed: status not ok")
+                    return False, None
 
-                    # Extract analysis data
-                    analysis = response.get("data", {}).get("analysis", {})
+                # Extract analysis data
+                analysis = response.get("data", {}).get("analysis", {})
 
-                    result = {
-                        "NAME": get_user_name_by_id(user_id),
-                        "DATE": get_datetime(),
-                        "HR": str(round(analysis["mean_hr_bpm"], 2)) + "BPM",
-                        "IBI": str(round(analysis["mean_rr_ms"], 2)) + "ms",
-                        "RMSSD": str(round(analysis["rmssd_ms"], 2)) + "ms",
-                        "SDNN": str(round(analysis["sdnn_ms"], 2)) + "ms",
-                        "SNS": str(round(analysis["sns_index"], 2)),
-                        "PNS": str(round(analysis["pns_index"], 2)),
-                        "STRESS": str(round(analysis["stress_index"], 2))
-                    }
-                    return True, result
-                else:
-                    # MAC mismatch, ignore
-                    print_log(f"MAC mismatch: expected {device_mac}, got {response.get('mac')}")
+                result = {
+                    "NAME": get_user_name_by_id(user_id),
+                    "DATE": get_datetime(),
+                    "HR": str(round(analysis["mean_hr_bpm"], 2)) + "BPM",
+                    "IBI": str(round(analysis["mean_rr_ms"], 2)) + "ms",
+                    "RMSSD": str(round(analysis["rmssd_ms"], 2)) + "ms",
+                    "SDNN": str(round(analysis["sdnn_ms"], 2)) + "ms",
+                    "SNS": str(round(analysis["sns_index"], 2)),
+                    "PNS": str(round(analysis["pns_index"], 2)),
+                    "STRESS": str(round(analysis["stress_index"], 2))
+                }
+                return True, result
 
             # Small delay to reduce CPU usage during wait
             time.sleep_ms(50)
