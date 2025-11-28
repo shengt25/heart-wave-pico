@@ -84,37 +84,41 @@ def ntp_timestamp_to_datetime(ntp_seconds):
 
 def load_users_list():
     """Load users from users.json file.
-    Returns a dictionary of {id: name} pairs.
-    If file doesn't exist or is malformed, creates a default file.
+    Returns a list of usernames.
+    If file doesn't exist or is malformed, returns empty list.
 
     Returns:
-        dict: Dictionary mapping user IDs to names
+        list: List of usernames
     """
     filename = "users.json"
     try:
         with open(filename, "r") as file:
             users = json.load(file)
             # Validate structure
-            if not isinstance(users, dict):
-                raise ValueError("users.json must contain a dictionary")
-            for key, value in users.items():
-                if not isinstance(key, str) or not isinstance(value, str):
-                    raise ValueError("Keys and values must be strings")
+            if not isinstance(users, list):
+                raise ValueError("users.json must contain an array")
+            for name in users:
+                if not isinstance(name, str):
+                    raise ValueError("All usernames must be strings")
             return users
     except Exception as e:
         print_log(f"users.json error ({e})")
+        return []
 
 def get_user_name_by_id(user_id):
-    """Get user name from ID by loading users.json.
+    """Get username from ID by loading users.json.
 
     Args:
-        user_id (str): The user ID to lookup
+        user_id (int or str): The user ID to lookup (index from 1)
 
     Returns:
-        str: The user name, or "Unknown User" if ID not found
+        str: The username, or "Unknown User" if ID not found
     """
     try:
         users = load_users_list()
-        return users.get(user_id, "Unknown User")
-    except OSError:
+        user_id_int = int(user_id)
+        if 1 <= user_id_int <= len(users):
+            return users[user_id_int - 1]
+        return "Unknown User"
+    except (ValueError, OSError):
         return "Unknown User"

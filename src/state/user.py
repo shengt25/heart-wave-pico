@@ -23,11 +23,10 @@ class UserSelect(State):
         self._user_ids.clear()
 
         try:
-            users_dict = load_users_list()
-            # Sort by ID for display
-            sorted_users = sorted(users_dict.items())
+            users_list = load_users_list()
 
-            for user_id, user_name in sorted_users:
+            # Enumerate with 1-based indexing
+            for user_id, user_name in enumerate(users_list, start=1):
                 self._user_items.append(f"{user_id}. {user_name}")
                 self._user_ids.append(user_id)
 
