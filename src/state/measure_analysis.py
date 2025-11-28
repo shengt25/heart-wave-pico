@@ -85,10 +85,16 @@ class HRVAnalysis(State):
         save_system(result_save, user_id)
         show_items = dict2show_items(result_save)
         # send to mqtt
-        measurement = {"mean_hr": result["HR"], "mean_ppi": result["IBI"],
-                       "rmssd": result["RMSSD"], "sdnn": result["SDNN"]}
-        topic = "hwp/measurement"
-        message = json.dumps(measurement)
+        self._state_machine.data_network.check_user_registration()
+        result_mqtt = {
+            "mac": self._state_machine.data_network.get_mac_address(),
+            "timestamp": get_ntp_timestamp(),
+            "patient_id": user_id,
+            "mean_hr": hr, "mean_ppi": ppi,
+            "rmssd": rmssd, "sdnn": sdnn
+        }
+        topic = "database/records/add"
+        message = json.dumps(result_mqtt)
         mqtt_success = self._state_machine.data_network.mqtt_publish(topic, message)
         if not mqtt_success:
             show_items.extend(["---", "MQTT not sent", "Please connect", "in settings"])
@@ -145,10 +151,18 @@ class KubiosAnalysis(State):
             save_system(result_save, user_id)
             show_items = dict2show_items(result_save)
             # send to mqtt
-            measurement = {"mean_hr": result["HR"], "mean_ppi": result["IBI"],
-                           "rmssd": result["RMSSD"], "sdnn": result["SDNN"]}
-            topic = "hwp/measurement"
-            message = json.dumps(measurement)
+            result_mqtt = {
+                "mac": self._state_machine.data_network.get_mac_address(),
+                "timestamp": get_ntp_timestamp(),
+                "patient_id": user_id,
+                "mean_hr": hr, "mean_ppi": ppi,
+                "rmssd": rmssd, "sdnn": sdnn,
+                "sns": sns, "pns": pns
+            }
+            self._state_machine.data_network.check_user_registration()
+
+            topic = "database/records/add"
+            message = json.dumps(result_mqtt)
             mqtt_success = self._state_machine.data_network.mqtt_publish(topic, message)
             if not mqtt_success:
                 show_items.extend(["---", "MQTT not sent", "Please connect", "in settings"])
