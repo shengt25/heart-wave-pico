@@ -22,9 +22,18 @@ class PicoNetwork:
     def connect_mqtt(self):
         try:
             self._mqtt_client.connect(clean_session=True, timeout=0.2)
+            if not self.is_mqtt_connected():
+                print_log("MQTT connect failed")
+                return False
+            print_log("MQTT connected")
+            print_log("Trying to set MQTT callback")
             self._mqtt_client.set_callback(self._mqtt_message_callback)
             # init subscriptions after connection
+            print_log("Trying to init MQTT subscriptions")
             self._init_subscriptions()
+            # register device, duplicate registrations are handled by server, no need to check beforehand
+            print_log("Trying to register device via MQTT")
+            self._register_device()
         except Exception as e:
             print_log(f"MQTT connect failed: {e}")
             return False
@@ -122,4 +131,16 @@ class PicoNetwork:
             return
 
     def _init_subscriptions(self):
+        print_log(f"Subscribing to MQTT topics")
         self._mqtt_client.subscribe(b"kubios/response")
+        self._mqtt_client.subscribe(b"database/response")
+
+    def _register_device(self):
+        """Register device with the server via MQTT."""
+        topic = "database/devices/add"
+        message = json.dumps({
+            "mac": self.get_mac_address(),
+            "device_name": "HeartWave pico"
+        })
+        print_log(f"Registering device: {message}")
+        self.mqtt_publish(topic, message)
