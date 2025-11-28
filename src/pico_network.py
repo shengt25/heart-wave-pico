@@ -42,7 +42,7 @@ class PicoNetwork:
     def mqtt_publish(self, topic, message):
         if GlobalSettings.mqtt_auto_connect:
             if self.is_mqtt_connected():
-                print_log("MQTT already connected")
+                print_log("Publishing and MQTT already connected")
             else:
                 # try to connect mqtt
                 max_retry = 3
@@ -63,6 +63,7 @@ class PicoNetwork:
                 print_log("MQTT not connected and auto connect disabled")
                 return False
         try:
+            print_log(f"Publishing MQTT message to topic {topic}: {message}")
             self._mqtt_client.publish(topic, message)
             # clean stale response if any
             self._mqtt_response = None
