@@ -3,21 +3,21 @@ import os
 import gc
 import machine
 import json
-import random
 
 
 class GlobalSettings:
-    print_log = False
+    debug_print = False
     save_directory = "Saved_Values"
     files_limit = 1000
     wifi_ssid = ""
     wifi_password = ""
     wifi_auto_connect = False
     mqtt_broker_ip = ""
+    mqtt_auto_connect = False
 
 
 def print_log(message):
-    if GlobalSettings.print_log:
+    if GlobalSettings.debug_print:
         print(time.ticks_ms(), message)
 
 
@@ -52,6 +52,8 @@ def load_settings(filename):
             GlobalSettings.wifi_password = settings["wifi_password"]
             GlobalSettings.wifi_auto_connect = settings["wifi_auto_connect"]
             GlobalSettings.mqtt_broker_ip = settings["mqtt_broker_ip"]
+            GlobalSettings.mqtt_auto_connect = settings["mqtt_auto_connect"]
+            GlobalSettings.debug_print = settings["debug_print"]
     except OSError:
         raise OSError("config file not found in the root directory.")
 
@@ -80,16 +82,43 @@ def ntp_timestamp_to_datetime(ntp_seconds):
     return datetime
 
 
-def get_random_name():
-    name_list = [
-        "Leona Golden",
-        "Amias Poole",
-        "Bonnie Lucero",
-        "Felipe Morales",
-        "Skylar Leonard",
-        "Ricardo Combs",
-        "Irene Holt",
-        "Niko Bishop"
-    ]
-    index = random.randint(0, len(name_list) - 1)
-    return name_list[index]
+def load_users_list():
+    """Load users from users.json file.
+    Returns a list of usernames.
+    If file doesn't exist or is malformed, returns empty list.
+
+    Returns:
+        list: List of usernames
+    """
+    filename = "users.json"
+    try:
+        with open(filename, "r") as file:
+            users = json.load(file)
+            # Validate structure
+            if not isinstance(users, list):
+                raise ValueError("users.json must contain an array")
+            for name in users:
+                if not isinstance(name, str):
+                    raise ValueError("All usernames must be strings")
+            return users
+    except Exception as e:
+        print_log(f"users.json error ({e})")
+        return []
+
+def get_user_name_by_id(user_id):
+    """Get username from ID by loading users.json.
+
+    Args:
+        user_id (int or str): The user ID to lookup (index from 1)
+
+    Returns:
+        str: The username, or "Unknown User" if ID not found
+    """
+    try:
+        users = load_users_list()
+        user_id_int = int(user_id)
+        if 1 <= user_id_int <= len(users):
+            return users[user_id_int - 1]
+        return "Unknown User"
+    except (ValueError, OSError):
+        return "Unknown User"

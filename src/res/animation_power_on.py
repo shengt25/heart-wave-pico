@@ -2127,15 +2127,14 @@ class PowerOnAnimation:
         buf_heartwave = framebuf.FrameBuffer(self._power_on_heartwave, 122, 27, framebuf.MONO_VLSB)
         for i in range(0, 64, 2):
             display.blit(buf_heartwave, 2, 0)
-            display.fill_rect(63 + 2 * i, 0, 128 - 63 - 2 * i, 63, 0)
-            display.fill_rect(0, 0, 63 - 2 * i, 63, 0)
+            display.fill_rect(63 + 5 * i, 0, 128 - 63 - 5 * i, 63, 0)
+            display.fill_rect(0, 0, 63 - 5 * i, 63, 0)
             display.show()
 
         for i in range(len(self.seq)):
             buf_pico = framebuf.FrameBuffer(self.seq[i], 61, 29, framebuf.MONO_VLSB)
             display.blit(buf_pico, 63, 32)
             display.show()
-        time.sleep_ms(500)
 
         buf_heart = framebuf.FrameBuffer(self._power_on_heart, 15, 13, framebuf.MONO_VLSB)
         display.blit(buf_heart, 23, 40)

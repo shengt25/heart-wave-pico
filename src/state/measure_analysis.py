@@ -1,11 +1,12 @@
 import time
-from src.utils import get_datetime, get_ntp_timestamp, get_random_name
-from src.result import dict2show_items
+from src.utils import get_datetime, get_ntp_timestamp, get_user_name_by_id
+from src.state.result import dict2show_items
 from src.save_system import save_system
-from src.state import State
+from src.state.state import State
 from src.data_processing import calculate_hrv, get_kubios_analysis
 from src.res.pic_loading_circle import LoadingCircle
 import framebuf
+import json
 
 
 class MeasureResultCheck(State):
@@ -71,17 +72,30 @@ class HRVAnalysis(State):
         hr, ppi, rmssd, sdnn = calculate_hrv(ibi_list)
         self._display.fill_rect(0, 14, 128, 50, 0)  # clear loading animation
         # save data
-        result = {"NAME": get_random_name(),
-                  "DATE": get_datetime(),
-                  "HR": str(hr) + "BPM",
-                  "IBI": str(ppi) + "ms",
-                  "RMSSD": str(rmssd) + "ms",
-                  "SDNN": str(sdnn) + "ms",
-                  "NTP_TIMESTAMP: ": get_ntp_timestamp()}
-        save_system(result)
-        show_items = dict2show_items(result)
+        user_id = self._state_machine.get_context('user_id')
+        result_save = {
+            "NAME": get_user_name_by_id(user_id),
+            "DATE": get_datetime(),
+            "HR": str(hr) + "BPM",
+            "IBI": str(ppi) + "ms",
+            "RMSSD": str(rmssd) + "ms",
+            "SDNN": str(sdnn) + "ms",
+            "NTP_TIMESTAMP: ": get_ntp_timestamp()
+        }
+        save_system(result_save, user_id)
+        show_items = dict2show_items(result_save)
         # send to mqtt
-        mqtt_success = self._state_machine.data_network.mqtt_publish(result)
+        self._state_machine.data_network.check_user_registration()
+        result_mqtt = {
+            "mac": self._state_machine.data_network.get_mac_address(),
+            "timestamp": get_ntp_timestamp(),
+            "patient_id": user_id,
+            "mean_hr": hr, "mean_ppi": ppi,
+            "rmssd": rmssd, "sdnn": sdnn
+        }
+        topic = "database/records/add"
+        message = json.dumps(result_mqtt)
+        mqtt_success = self._state_machine.data_network.mqtt_publish(topic, message)
         if not mqtt_success:
             show_items.extend(["---", "MQTT not sent", "Please connect", "in settings"])
         self._state_machine.set(state_code=self._state_machine.STATE_SHOW_RESULT, args=[show_items])
@@ -115,14 +129,41 @@ class KubiosAnalysis(State):
                 ani_index = (ani_index + 1) % len(loading_circle.seq)
                 ani_refresh_time = time.ticks_ms()
         """end of loading animation"""
-        kubios_success, result = get_kubios_analysis(self._ibi_list, self._state_machine.data_network, timeout_ms=10000)
+        user_id = self._state_machine.get_context('user_id')
+        kubios_success, result = get_kubios_analysis(self._ibi_list, self._state_machine.data_network, user_id, timeout_ms=10000)
         self._display.fill_rect(0, 14, 128, 50, 0)  # clear loading animation
         if kubios_success:
-            # success, save and goto show result
-            save_system(result)
-            show_items = dict2show_items(result)
+            # unpack the result
+            hr, ppi, rmssd, sdnn, sns, pns, stress = result
+            # save data
+            result_save = {
+                "NAME": get_user_name_by_id(user_id),
+                "DATE": get_datetime(),
+                "HR": str(hr) + "BPM",
+                "IBI": str(ppi) + "ms",
+                "RMSSD": str(rmssd) + "ms",
+                "SDNN": str(sdnn) + "ms",
+                "SNS": str(sns),
+                "PNS": str(pns),
+                "STRESS": str(stress),
+                "NTP_TIMESTAMP: ": get_ntp_timestamp()
+            }
+            save_system(result_save, user_id)
+            show_items = dict2show_items(result_save)
             # send to mqtt
-            mqtt_success = self._state_machine.data_network.mqtt_publish(result)
+            result_mqtt = {
+                "mac": self._state_machine.data_network.get_mac_address(),
+                "timestamp": get_ntp_timestamp(),
+                "patient_id": user_id,
+                "mean_hr": hr, "mean_ppi": ppi,
+                "rmssd": rmssd, "sdnn": sdnn,
+                "sns": sns, "pns": pns
+            }
+            self._state_machine.data_network.check_user_registration()
+
+            topic = "database/records/add"
+            message = json.dumps(result_mqtt)
+            mqtt_success = self._state_machine.data_network.mqtt_publish(topic, message)
             if not mqtt_success:
                 show_items.extend(["---", "MQTT not sent", "Please connect", "in settings"])
             self._state_machine.set(state_code=self._state_machine.STATE_SHOW_RESULT, args=[show_items])

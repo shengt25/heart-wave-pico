@@ -1,6 +1,6 @@
 import time
 from src.utils import pico_stat
-from src.state import State
+from src.state.state import State
 from src.res.pic_loading_circle import LoadingCircle
 import framebuf
 

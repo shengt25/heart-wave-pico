@@ -1,5 +1,5 @@
 import array
-from src.res.pic_icon import icon_hr, icon_hrv, icon_kubios, icon_history, icon_settings
+from src.res.pic_icon import icon_hr, icon_hrv, icon_kubios, icon_history, icon_user, icon_settings
 import framebuf
 from src.utils import print_log
 import os
@@ -404,6 +404,7 @@ class MenuView:
     _icon_buf_hrv = framebuf.FrameBuffer(icon_hrv, 32, 32, framebuf.MONO_VLSB)
     _icon_buf_kubios = framebuf.FrameBuffer(icon_kubios, 32, 32, framebuf.MONO_VLSB)
     _icon_buf_history = framebuf.FrameBuffer(icon_history, 32, 32, framebuf.MONO_VLSB)
+    _icon_buf_switch_user = framebuf.FrameBuffer(icon_user, 32, 32, framebuf.MONO_VLSB)
     _icon_buf_settings = framebuf.FrameBuffer(icon_settings, 32, 32, framebuf.MONO_VLSB)
 
     def __init__(self, display):
@@ -436,6 +437,9 @@ class MenuView:
             icon_buf = self._icon_buf_history
             text = "History"
         elif selection == 4:
+            icon_buf = self._icon_buf_switch_user
+            text = "Switch User"
+        elif selection == 5:
             icon_buf = self._icon_buf_settings
             text = "Settings"
         else:
@@ -445,7 +449,7 @@ class MenuView:
         self._display.text(text, int((128 - len(text) * 8) / 2), 38, 1)
         self._display.blit(icon_buf, int((128 - 32) / 2), 0)
         # draw selection indicator
-        for x in range(5):
-            self._display.rect(36 + 12 * x, 61, 2, 2, 1)
-        self._display.fill_rect(36 + 12 * selection, 60, 4, 4, 1)
+        for x in range(6):
+            self._display.rect(30 + 12 * x, 61, 2, 2, 1)
+        self._display.fill_rect(30 + 12 * selection, 60, 4, 4, 1)
         self._display.set_update()

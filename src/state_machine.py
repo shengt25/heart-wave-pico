@@ -1,11 +1,12 @@
 from src.hardware import Display, RotaryEncoder, HeartSensor
 from src.view import View
 from src.pico_network import PicoNetwork
-from src.main_menu import MainMenu
-from src.measure import MeasureWait, Measure
-from src.measure_analysis import MeasureResultCheck, HRVAnalysis, KubiosAnalysis
-from src.result import ShowHistory, ShowResult
-from src.settings import Settings, SettingsDebugInfo, SettingsWifi, SettingsMqtt, SettingsAbout
+from src.state.main_menu import MainMenu
+from src.state.measure import MeasureWait, Measure
+from src.state.measure_analysis import MeasureResultCheck, HRVAnalysis, KubiosAnalysis
+from src.state.result import ShowHistory, ShowResult
+from src.state.settings import Settings, SettingsDebugInfo, SettingsWifi, SettingsMqtt, SettingsAbout
+from src.state.user import UserSelect
 
 
 class StateMachine:
@@ -30,6 +31,7 @@ class StateMachine:
     STATE_SETTINGS_WIFI = 16
     STATE_SETTINGS_MQTT = 17
     STATE_SETTINGS_ABOUT = 18
+    STATE_USER_SELECT = 19
 
     # map the state code to each class object
     state_dict = {STATE_MENU: MainMenu,
@@ -45,6 +47,7 @@ class StateMachine:
                   STATE_SETTINGS_WIFI: SettingsWifi,
                   STATE_SETTINGS_MQTT: SettingsMqtt,
                   STATE_SETTINGS_ABOUT: SettingsAbout,
+                  STATE_USER_SELECT: UserSelect,
                   }
 
     def __init__(self):
@@ -54,6 +57,7 @@ class StateMachine:
         self.view = View(self.display)
         self.data_network = PicoNetwork()
         self.current_module = self.MODULE_MENU
+        self._context = {}  # storing cross-state data, such as: current user_id
         self._args = None
         self._states = {}
         self._state = None
@@ -100,3 +104,24 @@ class StateMachine:
 
     def get_states_info(self):
         return self._states
+
+    def set_context(self, key, value):
+        """Store a value in the state machine context.
+
+        Args:
+            key (str): Context key
+            value: Value to store
+        """
+        self._context[key] = value
+
+    def get_context(self, key):
+        """Retrieve a value from the state machine context.
+
+        Args:
+            key (str): Context key
+            default: Default value if key doesn't exist
+
+        Returns:
+            The stored value or default
+        """
+        return self._context.get(key, None)

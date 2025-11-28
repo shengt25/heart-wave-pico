@@ -1,3 +1,3 @@
 [submodule "pico-lib"]
-	path = src/pico-lib
-	url = https://gitlab.metropolia.fi/lansk/pico-lib.git
+	path = src/lib
+	url = https://gitlab.metropolia.fi/shengt/pico-lib.git
