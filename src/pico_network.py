@@ -159,10 +159,18 @@ class PicoNetwork:
         print_log(f"users_in_db: {users_in_db}")
         print_log(f"local_users: {local_users}")
 
+        # Convert list of user dicts to dict mapping ID -> Name
+        users_in_db_dict = {user['ID']: user['Name'] for user in users_in_db}
+
+        # Check each local user against database, register if not present
+        # However, due to:
+        #   1. the limitation of the database, whose id doesn't monotonically increase,
+        #   2. the local user list is also just a simple list, whose id also doesn't monotonically auto-increase,
+        # we assume that user list locally and remotely are always in order and no skipped IDs in between.
         for uid, name in enumerate(local_users, start=1):
-            if uid in users_in_db:
-                if users_in_db[uid] != name:
-                    print_log(f"User ID {uid} name mismatch: local '{name}' vs db '{users_in_db[uid]}'."
+            if uid in users_in_db_dict:
+                if users_in_db_dict[uid] != name:
+                    print_log(f"User ID {uid} name mismatch: local '{name}' vs db '{users_in_db_dict[uid]}'."
                               f"Please resolve manually.")
                 else:
                     print_log(f"User ID {uid} with name '{name}' already registered, no action needed.")
