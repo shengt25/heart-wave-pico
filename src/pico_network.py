@@ -1,5 +1,5 @@
 import network
-from src.utils import GlobalSettings, print_log
+from src.utils import GlobalSettings, print_log, load_users_list
 import json
 from umqtt.simple import MQTTClient
 import ubinascii
@@ -137,6 +137,48 @@ class PicoNetwork:
             print_log(f"Retry {retry}/{max_retry} for MQTT response...")
         print_log("MQTT response timeout")
         return None
+
+    def check_user_registration(self):
+        """Check if users and ids exist or match in the database.
+        If not exist, register the user. If exist but not match, give log warning.
+        """
+        list_topic = "database/patients/list"
+        list_message = json.dumps({"mac": self.get_mac_address()})
+        self.mqtt_publish(list_topic, list_message)
+
+        print_log("Waiting for database user list response...")
+        response = self.wait_mqtt_response_blocking("database/response", max_retry=3, timeout=3000)
+        if not response or response.get("message") != "OK":
+            print_log(f"Database response error: {response.get('message')}")
+            return
+
+        users_in_db = response.get("data")
+        local_users = load_users_list()
+
+        print_log(f"response: {response}")
+        print_log(f"users_in_db: {users_in_db}")
+        print_log(f"local_users: {local_users}")
+
+        for uid, name in enumerate(local_users, start=1):
+            if uid in users_in_db:
+                if users_in_db[uid] != name:
+                    print_log(f"User ID {uid} name mismatch: local '{name}' vs db '{users_in_db[uid]}'."
+                              f"Please resolve manually.")
+                else:
+                    print_log(f"User ID {uid} with name '{name}' already registered, no action needed.")
+            else:
+                # Register user
+                reg_topic = "database/patients/add"
+                reg_message = json.dumps({
+                    "mac": self.get_mac_address(),
+                    "patient_name": name,
+                })
+                self.mqtt_publish(reg_topic, reg_message)
+                reg_response = self.wait_mqtt_response_blocking("database/response", max_retry=3, timeout=3000)
+                if reg_response and reg_response.get("message") == "OK":
+                    print_log(f"User ID {uid} with name '{name}' registered successfully.")
+                else:
+                    print_log(f"Failed to register user ID {uid} with name '{name}': {reg_response}")
 
     def _mqtt_message_callback(self, topic, msg):
         """Handle incoming MQTT messages."""
