@@ -167,7 +167,7 @@ def calculate_hrv(IBI_list_raw):
     return round(average_HR, 2), round(mean_ibi, 2), round(RMSSD, 2), round(SDNN, 2)
 
 
-def get_kubios_analysis(ibi_list, pico_network, user_id, timeout_ms=10000):
+def get_kubios_analysis(ibi_list, pico_network, user_id, timeout_ms=5000):
     """
     Perform Kubios analysis via MQTT request-response.
 
