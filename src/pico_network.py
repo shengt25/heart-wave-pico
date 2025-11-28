@@ -184,9 +184,9 @@ class PicoNetwork:
                 self.mqtt_publish(reg_topic, reg_message)
                 reg_response = self.wait_mqtt_response_blocking("database/response", max_retry=3, timeout=3000)
                 if reg_response and reg_response.get("message") == "OK":
-                    print_log(f"User ID {uid} with name '{name}' registered successfully.")
+                    print_log(f"User '{name}' registered successfully.")
                 else:
-                    print_log(f"Failed to register user ID {uid} with name '{name}': {reg_response}")
+                    print_log(f"Failed to register user '{name}': {reg_response}")
 
     def _mqtt_message_callback(self, topic, msg):
         """Handle incoming MQTT messages."""
