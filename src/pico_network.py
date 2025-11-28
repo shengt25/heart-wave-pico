@@ -207,3 +207,9 @@ class PicoNetwork:
         })
         print_log(f"Registering device: {message}")
         self.mqtt_publish(topic, message)
+        response = self.wait_mqtt_response_blocking("database/response", max_retry=3, timeout=3000)
+        # not important to check duplicate registration here, but we need to consume the response
+        if response and response.get("message") == "OK":
+            print_log("Device registration successful")
+        else:
+            print_log(f"Device registration failed: {response}")
