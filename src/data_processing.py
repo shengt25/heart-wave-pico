@@ -1,7 +1,6 @@
-from src.utils import print_log, get_datetime, get_user_name_by_id, GlobalSettings
+from src.utils import print_log, get_datetime, GlobalSettings
 from math import sqrt
 from src.data_structure import Fifo, SlidingWindow
-import time
 import json
 
 
@@ -203,24 +202,22 @@ def get_kubios_analysis(ibi_list, pico_network, user_id, timeout_ms=5000):
 
         if response:
             # Verify status is ok
-            if response.get("data", {}).get("status") != "ok":
+            if response.get("data").get("status") != "ok":
                 print_log("Kubios analysis failed: status not ok")
                 return False, None
 
             # Extract analysis data
-            analysis = response.get("data", {}).get("analysis", {})
+            analysis = response.get("data").get("analysis")
+            result = [
+                round(analysis["mean_hr_bpm"], 2),
+                round(analysis["mean_rr_ms"], 2),
+                round(analysis["rmssd_ms"], 2),
+                round(analysis["sdnn_ms"], 2),
+                round(analysis["sns_index"], 2),
+                round(analysis["pns_index"], 2),
+                round(analysis["stress_index"], 2)
+            ]
 
-            result = {
-                "NAME": get_user_name_by_id(user_id),
-                "DATE": get_datetime(),
-                "HR": str(round(analysis["mean_hr_bpm"], 2)) + "BPM",
-                "IBI": str(round(analysis["mean_rr_ms"], 2)) + "ms",
-                "RMSSD": str(round(analysis["rmssd_ms"], 2)) + "ms",
-                "SDNN": str(round(analysis["sdnn_ms"], 2)) + "ms",
-                "SNS": str(round(analysis["sns_index"], 2)),
-                "PNS": str(round(analysis["pns_index"], 2)),
-                "STRESS": str(round(analysis["stress_index"], 2))
-            }
             return True, result
         else:
             print_log("Kubios analysis timeout")

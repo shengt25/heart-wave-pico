@@ -73,15 +73,17 @@ class HRVAnalysis(State):
         self._display.fill_rect(0, 14, 128, 50, 0)  # clear loading animation
         # save data
         user_id = self._state_machine.get_context('user_id')
-        result = {"NAME": get_user_name_by_id(user_id),
-                  "DATE": get_datetime(),
-                  "HR": str(hr) + "BPM",
-                  "IBI": str(ppi) + "ms",
-                  "RMSSD": str(rmssd) + "ms",
-                  "SDNN": str(sdnn) + "ms",
-                  "NTP_TIMESTAMP: ": get_ntp_timestamp()}
-        save_system(result, user_id)
-        show_items = dict2show_items(result)
+        result_save = {
+            "NAME": get_user_name_by_id(user_id),
+            "DATE": get_datetime(),
+            "HR": str(hr) + "BPM",
+            "IBI": str(ppi) + "ms",
+            "RMSSD": str(rmssd) + "ms",
+            "SDNN": str(sdnn) + "ms",
+            "NTP_TIMESTAMP: ": get_ntp_timestamp()
+        }
+        save_system(result_save, user_id)
+        show_items = dict2show_items(result_save)
         # send to mqtt
         measurement = {"mean_hr": result["HR"], "mean_ppi": result["IBI"],
                        "rmssd": result["RMSSD"], "sdnn": result["SDNN"]}
@@ -125,9 +127,23 @@ class KubiosAnalysis(State):
         kubios_success, result = get_kubios_analysis(self._ibi_list, self._state_machine.data_network, user_id, timeout_ms=10000)
         self._display.fill_rect(0, 14, 128, 50, 0)  # clear loading animation
         if kubios_success:
-            # success, save and goto show result
-            save_system(result, user_id)
-            show_items = dict2show_items(result)
+            # unpack the result
+            hr, ppi, rmssd, sdnn, sns, pns, stress = result
+            # save data
+            result_save = {
+                "NAME": get_user_name_by_id(user_id),
+                "DATE": get_datetime(),
+                "HR": str(hr) + "BPM",
+                "IBI": str(ppi) + "ms",
+                "RMSSD": str(rmssd) + "ms",
+                "SDNN": str(sdnn) + "ms",
+                "SNS": str(sns),
+                "PNS": str(pns),
+                "STRESS": str(stress),
+                "NTP_TIMESTAMP: ": get_ntp_timestamp()
+            }
+            save_system(result_save, user_id)
+            show_items = dict2show_items(result_save)
             # send to mqtt
             measurement = {"mean_hr": result["HR"], "mean_ppi": result["IBI"],
                            "rmssd": result["RMSSD"], "sdnn": result["SDNN"]}
