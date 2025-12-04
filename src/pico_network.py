@@ -123,9 +123,10 @@ class PicoNetwork:
         self._mqtt_response_topic = None
         return response
 
-    def wait_mqtt_response_blocking(self, expected_topic_str, max_retry=3, timeout=5000, polling_interval=500):
+    def wait_mqtt_response_blocking(self, expected_topic_str, timeout=1000, max_retry=3):
         """Blocking wait for MQTT response with retries."""
         retry = 0
+        polling_interval = timeout // max_retry
         while retry < max_retry:
             start_time = time.ticks_ms()
             while time.ticks_diff(time.ticks_ms(), start_time) < timeout:
@@ -147,8 +148,11 @@ class PicoNetwork:
         self.mqtt_publish(list_topic, list_message)
 
         print_log("Waiting for database user list response...")
-        response = self.wait_mqtt_response_blocking("database/response", max_retry=3, timeout=3000)
-        if not response or response.get("message") != "OK":
+        response = self.wait_mqtt_response_blocking("database/response")
+        if not response:
+            return
+
+        if response.get("message") != "OK":
             print_log(f"Database response error: {response.get('message')}")
             return
 
@@ -182,7 +186,7 @@ class PicoNetwork:
                     "patient_name": name,
                 })
                 self.mqtt_publish(reg_topic, reg_message)
-                reg_response = self.wait_mqtt_response_blocking("database/response", max_retry=3, timeout=3000)
+                reg_response = self.wait_mqtt_response_blocking("database/response")
                 if reg_response and reg_response.get("message") == "OK":
                     print_log(f"User '{name}' registered successfully.")
                 else:
@@ -215,7 +219,7 @@ class PicoNetwork:
         })
         print_log(f"Registering device: {message}")
         self.mqtt_publish(topic, message)
-        response = self.wait_mqtt_response_blocking("database/response", max_retry=3, timeout=3000)
+        response = self.wait_mqtt_response_blocking("database/response")
         # not important to check duplicate registration here, but we need to consume the response
         if response and response.get("message") == "OK":
             print_log("Device registration successful")
