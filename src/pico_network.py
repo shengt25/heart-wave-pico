@@ -148,7 +148,10 @@ class PicoNetwork:
 
         print_log("Waiting for database user list response...")
         response = self.wait_mqtt_response_blocking("database/response", max_retry=3, timeout=3000)
-        if not response or response.get("message") != "OK":
+        if not response:
+            return
+
+        if response.get("message") != "OK":
             print_log(f"Database response error: {response.get('message')}")
             return
 
