@@ -69,7 +69,7 @@ def get_datetime():
 def get_ntp_timestamp():
     rtc = machine.RTC()
     dt = rtc.datetime()
-    unix_time = time.mktime((dt[0], dt[1], dt[2], dt[4], dt[5], dt[6], 0, 0))
+    unix_time = time.mktime((dt[0], dt[1], dt[2], dt[4], dt[5], dt[6], 0, 0, 0))
     ntp_seconds = unix_time + 2208988800
     return ntp_seconds
 
