@@ -98,6 +98,8 @@ class PicoNetwork:
         return True
 
     def get_mqtt_response(self, expected_topic_str):
+        """Check and get mqtt response only once, non-blocking, also filters the response with topic and device's mac address
+        """
         try:
             self._mqtt_client.check_msg()
         except Exception as e:
@@ -124,7 +126,12 @@ class PicoNetwork:
         return response
 
     def wait_mqtt_response_blocking(self, expected_topic_str, timeout=1000, max_retry=3):
-        """Blocking wait for MQTT response with retries, until timeout"""
+        """Wait for MQTT response with retries. It blocks the system until timeout reached or response received.
+        :param expected_topic_str: Filter with topic
+        :param timeout: block until the timeout reached, or the response received, whichever comes first
+        :param max_retry: the max retry times within the timeout period. It will sleep timeout/max_retry milliseconds
+                          between every retry so it won't repeat too fast which "overwhelms" the system
+        """
         retry = 0
         polling_interval = timeout // max_retry
         while retry < max_retry:
