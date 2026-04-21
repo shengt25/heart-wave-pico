@@ -6,7 +6,7 @@ import json
 
 class IBICalculator:
     def __init__(self, sensor_fifo, sampling_rate, min_hr=40, max_hr=180):
-        # data store and output
+        # data store, output
         self.ibi_fifo = Fifo(20, 'H')
         # hardware
         self._sensor_fifo = sensor_fifo
